@@ -2,11 +2,10 @@ module github.com/jlogelin/wormhole
 
 go 1.18
 
-require github.com/application-research/whypfs-core v0.1.1-0.20221202192558-1782fa637898
-
 require (
 	github.com/anacrolix/log v0.13.1
 	github.com/application-research/filclient v0.4.0
+	github.com/application-research/whypfs-core v0.1.1-0.20221201142932-3f0670fad0fb
 	github.com/dustin/go-humanize v1.0.0
 	github.com/filecoin-project/go-address v1.1.0
 	github.com/filecoin-project/go-fil-markets v1.25.1

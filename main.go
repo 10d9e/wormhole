@@ -13,6 +13,7 @@ import (
 
 	whypfs "github.com/application-research/whypfs-core"
 	"github.com/ipfs/go-cid"
+	leveldb "github.com/ipfs/go-ds-leveldb"
 	levelds "github.com/ipfs/go-ds-leveldb"
 	fc "github.com/jlogelin/wormhole/filecoin"
 )
@@ -63,11 +64,40 @@ func BootstrapWhyPFS() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	node, err := whypfs.NewNode(whypfs.NewNodeParams{
-		Ctx:       ctx,
-		Datastore: whypfs.NewInMemoryDatastore(),
-		Config:    optimalConfig(),
-	})
+	/*
+		node, err := whypfs.NewNode(whypfs.NewNodeParams{
+			Ctx: ctx,
+			// Datastore: whypfs.NewInMemoryDatastore(),
+			Config: optimalConfig(),
+		})
+	*/
+
+	node, err := whypfs.NewNode(
+		whypfs.NewNodeParams{
+			Ctx: context.Background(),
+			Config: &whypfs.Config{
+				Libp2pKeyFile: "libp2p.key",
+				ListenAddrs:   []string{"/ip4/0.0.0.0/tcp/9490"},
+				AnnounceAddrs: nil,
+				DatastoreDir: struct {
+					Directory string
+					Options   leveldb.Options
+				}{
+					Directory: "datastore",
+					Options:   leveldb.Options{},
+				},
+				Blockstore:        ":flatfs:.whypfs/blocks",
+				NoBlockstoreCache: false,
+				NoLimiter:         true,
+				BitswapConfig: whypfs.BitswapConfig{
+					MaxOutstandingBytesPerPeer: 20 << 20,
+					TargetMessageSize:          2 << 20,
+				},
+				//LimitsConfig            Limits
+				ConnectionManagerConfig: whypfs.ConnectionManager{},
+			},
+		})
+	check(err)
 
 	node.BootstrapPeers(whypfs.DefaultBootstrapPeers())
 	check(err)
@@ -91,7 +121,7 @@ func BootstrapWhyPFS() {
 
 	*/
 
-	file, err := node.AddPinFile(context.Background(), bytes.NewReader([]byte("lodgewashere!")), nil)
+	file, err := node.AddPinFile(context.Background(), bytes.NewReader([]byte("lodgewasheresdfsdfsd!")), nil)
 	if err != nil {
 		return
 	}
