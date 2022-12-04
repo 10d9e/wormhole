@@ -1,2 +1,2 @@
 # wormhole
-Wormhole is an experimental IPFS node backed by the Filecoin Graphsync Protocol
+Wormhole is an experimental WhyPFS node backed by the Filecoin Graphsync Protocol
