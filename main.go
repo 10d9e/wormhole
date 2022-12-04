@@ -18,11 +18,13 @@ import (
 var (
 	// OsSignal signal used to shutdown
 	OsSignal chan os.Signal
+	node     *whypfs.Node
 )
 
 func main() {
 	OsSignal = make(chan os.Signal, 1)
 	BootstrapWhyPFS()
+	playtime()
 	LoopForever()
 }
 
@@ -37,18 +39,8 @@ func LoopForever() {
 }
 
 func BootstrapWhyPFS() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	/*
-		node, err := whypfs.NewNode(whypfs.NewNodeParams{
-			Ctx: ctx,
-			// Datastore: whypfs.NewInMemoryDatastore(),
-			Config: optimalConfig(),
-		})
-	*/
-
-	node, err := whypfs.NewNode(
+	var err error
+	n, err := whypfs.NewNode(
 		whypfs.NewNodeParams{
 			Ctx: context.Background(),
 			Config: &whypfs.Config{
@@ -69,18 +61,22 @@ func BootstrapWhyPFS() {
 					MaxOutstandingBytesPerPeer: 20 << 20,
 					TargetMessageSize:          2 << 20,
 				},
-				//LimitsConfig            Limits
 				ConnectionManagerConfig: whypfs.ConnectionManager{},
 			},
 		})
 	check(err)
 
-	node.BootstrapPeers(whypfs.DefaultBootstrapPeers())
+	n.BootstrapPeers(whypfs.DefaultBootstrapPeers())
 	check(err)
 
-	fmt.Printf("Using peer ID: %s \n", node.Host.ID())
-	fmt.Printf("Addrs: %s \n", node.Host.Addrs())
+	fmt.Printf("Using peer ID: %s \n", n.Host.ID())
 
+	node = n
+}
+
+func playtime() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	/*
 		c1, _ := cid.Decode("QmbJGGJkjGfYCmHqwoMjLTbUA6bdcFBbNdWChFY6dKNRWx")
 		rsc1, err := node.GetFile(ctx, c1)
@@ -97,7 +93,7 @@ func BootstrapWhyPFS() {
 
 	*/
 
-	file, err := node.AddPinFile(context.Background(), bytes.NewReader([]byte("lodgewasheresdfsdfsd!")), nil)
+	file, err := node.AddPinFile(context.Background(), bytes.NewReader([]byte("lodgewasheresfdsfdfsdfsd!")), nil)
 	if err != nil {
 		return
 	}
