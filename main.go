@@ -7,14 +7,11 @@ import (
 	"io"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
-	"time"
 
 	whypfs "github.com/application-research/whypfs-core"
 	"github.com/ipfs/go-cid"
 	leveldb "github.com/ipfs/go-ds-leveldb"
-	levelds "github.com/ipfs/go-ds-leveldb"
 	fc "github.com/jlogelin/wormhole/filecoin"
 )
 
@@ -39,27 +36,6 @@ func LoopForever() {
 	fmt.Printf("Exiting infinite loop received OsSignal\n")
 }
 
-func optimalConfig() *whypfs.Config {
-	// optimal settings
-	cfg := &whypfs.Config{}
-	cfg.Offline = false
-	cfg.ReprovideInterval = 8 * time.Hour
-	cfg.NoBlockstoreCache = false
-	cfg.NoAnnounceContent = false
-	cfg.NoLimiter = false
-	cfg.BitswapConfig.MaxOutstandingBytesPerPeer = 20 << 20
-	cfg.BitswapConfig.TargetMessageSize = 2 << 20
-	cfg.ConnectionManagerConfig.HighWater = 1000
-	cfg.ConnectionManagerConfig.LowWater = 900
-	cfg.DatastoreDir.Directory = "datastore"
-	cfg.DatastoreDir.Options = levelds.Options{}
-	cfg.Blockstore = ":flatfs:.whypfs/blocks"
-	cfg.Libp2pKeyFile = filepath.Join("libp2p.key")
-	cfg.ListenAddrs = []string{"/ip4/0.0.0.0/tcp/6746"}
-	cfg.AnnounceAddrs = []string{"/ip4/0.0.0.0/tcp/0"}
-	return cfg
-}
-
 func BootstrapWhyPFS() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -77,7 +53,7 @@ func BootstrapWhyPFS() {
 			Ctx: context.Background(),
 			Config: &whypfs.Config{
 				Libp2pKeyFile: "libp2p.key",
-				ListenAddrs:   []string{"/ip4/0.0.0.0/tcp/9490"},
+				ListenAddrs:   []string{"/ip4/0.0.0.0/tcp/6746"},
 				AnnounceAddrs: nil,
 				DatastoreDir: struct {
 					Directory string
